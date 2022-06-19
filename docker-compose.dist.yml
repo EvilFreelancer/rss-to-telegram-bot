@@ -1,0 +1,23 @@
+version: "2.4"
+
+services:
+
+  rss-to-telegram-bot:
+    restart: "unless-stopped"
+    build:
+      context: .
+    environment:
+      # Timeout in seconds between requests to rss feed
+      TS_TIMEOUT: 600
+      # Path to RSS feed cache folder
+      RSSREADER_CACHE_DIR: /app/cache
+      # Telegram Channel Name
+      TELEGRAM_CHANNEL_NAME: evilfreelancer
+      # Telegram Access Token
+      TELEGRAM_TOKEN: nnnnnnnnnnnnn:xxxXXXxXxXxXxXXxXxxXxxxxXx
+    volumes:
+      - ./bot_cache:/app/cache:rw
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50k"

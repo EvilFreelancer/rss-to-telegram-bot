@@ -1,5 +1,4 @@
 /.idea
 /vendor
 /.env
-/docker-compose.yml
 /bot_cache
