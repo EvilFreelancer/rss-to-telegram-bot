@@ -13,10 +13,16 @@ $dotenv->load(__DIR__ . '/.env');
 $tgChannelName = $_ENV['TELEGRAM_CHANNEL_NAME'];
 $tgToken       = $_ENV['TELEGRAM_TOKEN'];
 
+// Parse list of sources
+$sources = explode(',', $_ENV['RSSREADER_SOURCES']);
+
+// If no sources then error
+if (empty($sources)) {
+    throw new \RuntimeException('There is no sources');
+}
+
 // Read channels
-$rss = new RssReader([
-    'https://3dnews.ru/breaking/rss/',
-]);
+$rss = new RssReader($sources);
 
 // Get all posts
 $posts = $rss->getAll();
@@ -36,6 +42,5 @@ foreach ($posts as $post) {
 
     $url = 'https://api.telegram.org/bot' . $tgToken . '/' . $endpoint . '?' . http_build_query($query);
 
-    dd($url);
     exec('curl ' . $url);
 }
