@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "23b60b08718dd88858c9212ae7a56c13",
+    "content-hash": "5d4273ec638d10b6a2457a5958e135dd",
     "packages": [
         {
             "name": "compolomus/rssreader",
@@ -356,8 +356,7 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1",
-        "ext-dom": "*",
-        "ext-curl": "*"
+        "ext-dom": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.2.0"

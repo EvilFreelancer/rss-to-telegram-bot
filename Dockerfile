@@ -8,7 +8,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 WORKDIR /app
 
 RUN set -xe \
- && apk add --no-cache --update bash curl
+ && apk add --no-cache --update bash curl libxml2-dev \
+ && docker-php-ext-install xml \
+ && docker-php-ext-enable xml
 
 COPY . .
 
