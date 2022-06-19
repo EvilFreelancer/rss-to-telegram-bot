@@ -9,8 +9,8 @@ WORKDIR /app
 
 RUN set -xe \
  && apk add --no-cache --update bash curl libxml2-dev \
- && docker-php-ext-install xml \
- && docker-php-ext-enable xml
+ && docker-php-ext-install xml dom \
+ && docker-php-ext-enable xml dom
 
 COPY . .
 
