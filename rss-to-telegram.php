@@ -6,8 +6,10 @@ use Compolomus\RssReader\RssReader;
 use Symfony\Component\Dotenv\Dotenv;
 
 // Load env variables
-$dotenv = new Dotenv();
-$dotenv->load(__DIR__ . '/.env');
+if (file_exists(__DIR__ . '/.env')) {
+    $dotenv = new Dotenv();
+    $dotenv->load(__DIR__ . '/.env');
+}
 
 // Read settings
 $tgChannelName = $_ENV['TELEGRAM_CHANNEL_NAME'];
