@@ -12,5 +12,5 @@ chown -R nobody:nobody "$RSSREADER_CACHE_DIR"
 # Run infinity loop
 while true; do
   su -s /bin/bash -c "php -f /app/rss-to-telegram.php" nobody
-  sleep $TS_TIMEOUT
+  sleep $RSSREADER_TIMEOUT
 done
