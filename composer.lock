@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d4273ec638d10b6a2457a5958e135dd",
+    "content-hash": "0f4c45d6fd99af27f4d67f1c08f4e7b9",
     "packages": [
         {
             "name": "compolomus/rssreader",
-            "version": "dev-master",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Compolomus/RssReader.git",
-                "reference": "366ba7e282faaa9203a105e862f80acfc0e9658e"
+                "reference": "82d1d890c0446728d8fd0b54414d831a4f1161ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Compolomus/RssReader/zipball/366ba7e282faaa9203a105e862f80acfc0e9658e",
-                "reference": "366ba7e282faaa9203a105e862f80acfc0e9658e",
+                "url": "https://api.github.com/repos/Compolomus/RssReader/zipball/82d1d890c0446728d8fd0b54414d831a4f1161ae",
+                "reference": "82d1d890c0446728d8fd0b54414d831a4f1161ae",
                 "shasum": ""
             },
             "require": {
@@ -33,7 +33,6 @@
             "suggest": {
                 "ext-xdebug": "^3.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -56,9 +55,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Compolomus/RssReader/issues",
-                "source": "https://github.com/Compolomus/RssReader/tree/master"
+                "source": "https://github.com/Compolomus/RssReader/tree/1.0"
             },
-            "time": "2022-06-19T18:38:52+00:00"
+            "time": "2022-07-05T21:11:09+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -349,9 +348,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "compolomus/rssreader": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

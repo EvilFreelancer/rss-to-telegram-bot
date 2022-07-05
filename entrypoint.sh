@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # If timeout is not set then use 3600 seconds (1 hour) by default
-TS_TIMEOUT="${TS_TIMEOUT:-3600}"
+RSSREADER_TIMEOUT="${RSSREADER_TIMEOUT:-3600}"
 
 # If directory is not set, then use defaults
 RSSREADER_CACHE_DIR="${RSSREADER_CACHE_DIR:-/app/cache}"

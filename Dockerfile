@@ -1,6 +1,6 @@
 FROM php:8.1-alpine
 
-ENV TS_TIMEOUT=600
+ENV RSSREADER_TIMEOUT=3600
 ENV RSSREADER_CACHE_DIR=/app/cache
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
