@@ -17,6 +17,7 @@ cd rss-to-telegram-bot
 ```
 
 4. Create `.env` file from example
+
 ```shell
 cp .env.dist .env
 ```
@@ -24,6 +25,7 @@ cp .env.dist .env
 3. Fix `.env` parameters, you at least need to add list of RSS feed sources
 
 4. Run script
+
 ```shell
 php -f rss-to-telegram.php
 ```
@@ -65,14 +67,15 @@ services:
 
 ## Environment variables
 
-| Name                  | Default value                         | Description                                 |
-|-----------------------|---------------------------------------|---------------------------------------------|
-| RSSREADER_TIMEOUT     | 3600 _(in seconds)_                   | Timeout between requests for updates        |
-| RSSREADER_CACHE_DIR   | /tmp/.rssreader_cache                 | Path to directory with cache                |
-| RSSREADER_LIMIT       | 0 _(0, empty or not set - unlimited)_ | Limiting the number of recent posts         |
-| RSSREADER_SOURCES     | _null_                                | List of comma-separated URLs of RSS sources | 
-| TELEGRAM_CHANNEL_NAME | _null_                                | Telegram Channel Name                       |
-| TELEGRAM_TOKEN        | _null_                                | Telegram Access Token                       |
+| Name                              | Default value                         | Description                                 |
+|-----------------------------------|---------------------------------------|---------------------------------------------|
+| RSSREADER_TIMEOUT                 | 3600 _(in seconds)_                   | Timeout between requests for updates        |
+| RSSREADER_CACHE_DIR               | /tmp/.rssreader_cache                 | Path to directory with cache                |
+| RSSREADER_LIMIT                   | 0 _(0, empty or not set - unlimited)_ | Limiting the number of recent posts         |
+| RSSREADER_SOURCES                 | _null_                                | List of comma-separated URLs of RSS sources | 
+| RSSREADER_SHOW_CATEGORIES_AS_TAGS | false                                 | If you want to show categories as hash-tags | 
+| TELEGRAM_CHANNEL_NAME             | _null_                                | Telegram Channel Name                       |
+| TELEGRAM_TOKEN                    | _null_                                | Telegram Access Token                       |
 
 ## Links
 

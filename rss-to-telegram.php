@@ -23,6 +23,40 @@ if (empty($sources)) {
     throw new \RuntimeException('There is no sources');
 }
 
+// Convert categories to hash-tags
+$showCategoriesAsTags = (bool) $_ENV['RSSREADER_SHOW_CATEGORIES_AS_TAGS'];
+
+function renderTemplate(array $data): string
+{
+    global $showCategoriesAsTags, $tgChannelName;
+
+    // Default template
+    $template = "<a href='{{link}}'>{{title}}</a>\n{{description}}\n\n";
+
+    // Fix template of categories as tags mode enabled
+    if ($showCategoriesAsTags) {
+        // Parse categories
+        $categories = [];
+        foreach ($data['categories'] as $category) {
+            // Fix spaces and special characters
+            $categories[] = '#' . str_replace([' ', '-', '+'], ['_', '_', '_'], $category);
+        }
+        $data['categories'] = implode(' ', $categories);
+
+        // Fix template too
+        $template .= "{{categories}} | ";
+    }
+
+    // Append name of telegram channel
+    $template .= "@" . $tgChannelName;
+
+    $result = $template;
+    foreach ($data as $key => $value) {
+        $result = str_replace("{{" . $key . "}}", $value, $result);
+    }
+    return $result;
+}
+
 // Read channels
 $rss = new RssReader($sources);
 
@@ -32,13 +66,18 @@ $posts = $rss->getAll();
 // Submit all received posts to Telegram
 foreach ($posts as $post) {
     // Build text message
-    $message  = '[' . $post['title'] . '](' . $post['link'] . ')' . PHP_EOL . html_entity_decode($post['desc']);
+    $message  = renderTemplate([
+        'link'        => $post['link'],
+        'title'       => $post['title'],
+        'categories'  => $post['category'],
+        'description' => str_replace("&nbsp;", " ", strip_tags($post['description'], ['a'])),
+    ]);
     $endpoint = 'sendMessage';
     $query    = [
         'chat_id'                  => '@' . $tgChannelName,
         'disable_notification'     => true,
         'disable_web_page_preview' => false,
-        'parse_mode'               => 'Markdown',
+        'parse_mode'               => 'HTML',
         'text'                     => $message,
     ];
 
@@ -46,5 +85,5 @@ foreach ($posts as $post) {
 
     echo '>>> ' . $post['id'] . PHP_EOL;
     echo exec('curl "' . $url . '"') . PHP_EOL;
-    sleep(1);
+    sleep(5);
 }

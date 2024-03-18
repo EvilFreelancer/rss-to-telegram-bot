@@ -1,11 +1,6 @@
 {
   "name": "evilfreelancer/rss-to-telegram-bot",
   "type": "project",
-  "autoload": {
-    "psr-4": {
-      "RssToTelegramBot\\": "src/"
-    }
-  },
   "authors": [
     {
       "name": "Paul Rock",
@@ -13,9 +8,10 @@
     }
   ],
   "require": {
-    "php": "^8.1",
-    "ext-dom": "*",
-    "compolomus/rssreader": "^1.0",
+    "php": "^8.2",
+    "ext-simplexml": "*",
+    "ext-libxml": "*",
+    "compolomus/rssreader": "^2.0",
     "symfony/dotenv": "^6.1"
   },
   "require-dev": {
