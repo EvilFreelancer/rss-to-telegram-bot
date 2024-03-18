@@ -85,7 +85,7 @@ foreach ($posts as $post) {
 
     $url = 'https://api.telegram.org/bot' . $tgToken . '/' . $endpoint . '?' . http_build_query($query);
 
-    echo '>>> ' . $post['id'] . PHP_EOL;
+    echo '>>> ' . $post['_id'] . PHP_EOL;
     echo exec('curl "' . $url . '"') . PHP_EOL;
     sleep(5);
 }
