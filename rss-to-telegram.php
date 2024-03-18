@@ -45,6 +45,8 @@ function renderTemplate(array $data): string
 
         // Fix template too
         $template .= "{{categories}} | ";
+    } else {
+        unset($data['categories']);
     }
 
     // Append name of telegram channel
@@ -67,10 +69,10 @@ $posts = $rss->getAll();
 foreach ($posts as $post) {
     // Build text message
     $message  = renderTemplate([
-        'link'        => $post['link'],
-        'title'       => $post['title'],
-        'categories'  => $post['category'],
-        'description' => str_replace("&nbsp;", " ", strip_tags($post['description'], ['a'])),
+        'link'        => $post['link'] ?? '',
+        'title'       => $post['title'] ?? '',
+        'categories'  => $post['category'] ?? [],
+        'description' => str_replace("&nbsp;", " ", strip_tags($post['description'] ?? '', ['a'])),
     ]);
     $endpoint = 'sendMessage';
     $query    = [
