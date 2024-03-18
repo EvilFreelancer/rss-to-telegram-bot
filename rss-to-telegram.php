@@ -24,7 +24,7 @@ if (empty($sources)) {
 }
 
 // Convert categories to hash-tags
-$showCategoriesAsTags = (bool) $_ENV['RSSREADER_SHOW_CATEGORIES_AS_TAGS'];
+$showCategoriesAsTags = (bool) ($_ENV['RSSREADER_SHOW_CATEGORIES_AS_TAGS'] ?? false);
 
 function renderTemplate(array $data): string
 {
