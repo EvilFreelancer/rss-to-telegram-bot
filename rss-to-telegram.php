@@ -26,12 +26,26 @@ if (empty($sources)) {
 // Convert categories to hash-tags
 $showCategoriesAsTags = (bool) ($_ENV['RSSREADER_SHOW_CATEGORIES_AS_TAGS'] ?? false);
 
+function prepareHTML(string $string): string
+{
+    // Convert entities like &nbsp; and &arr; to symbols
+    $string = html_entity_decode($string);
+    // Replace <br/> tag to a EOL
+    $string = preg_replace('/\<br(\s*)?\/?\>/i', "\n\n", $string);
+    // Replace couple </p><p> to a EOL
+    $string = preg_replace('/\<\/p\>\s*\<p\>/i', "\n\n", $string);
+    // Cleanup other tags
+    $string = strip_tags($string, ['a']);
+
+    return $string;
+}
+
 function renderTemplate(array $data): string
 {
     global $showCategoriesAsTags, $tgChannelName;
 
     // Default template
-    $template = "<a href='{{link}}'>{{title}}</a>\n{{description}}\n\n";
+    $template = "<a href='{{link}}'>{{title}}</a>\n\n{{description}}\n\n";
 
     // Fix template of categories as tags mode enabled
     if ($showCategoriesAsTags) {
@@ -39,7 +53,7 @@ function renderTemplate(array $data): string
         $categories = [];
         foreach ($data['categories'] as $category) {
             // Fix spaces and special characters
-            $categories[] = '#' . str_replace([' ', '-', '+'], ['_', '_', '_'], $category);
+            $categories[] = '#' . preg_replace('/[\s\-\+\&\(\)\.]+/', '_', mb_strtolower($category));
         }
         $data['categories'] = implode(' ', $categories);
 
@@ -72,7 +86,7 @@ foreach ($posts as $post) {
         'link'        => $post['link'] ?? '',
         'title'       => $post['title'] ?? '',
         'categories'  => $post['category'] ?? [],
-        'description' => str_replace("&nbsp;", " ", strip_tags($post['description'] ?? '', ['a'])),
+        'description' => prepareHTML($post['description'] ?? ''),
     ]);
     $endpoint = 'sendMessage';
     $query    = [
