@@ -58,7 +58,9 @@ function renderTemplate(array $data): string
         $data['categories'] = implode(' ', $categories);
 
         // Fix template too
-        $template .= "{{categories}} | ";
+        if (!empty($categories)) {
+            $template .= "{{categories}} | ";
+        }
     } else {
         unset($data['categories']);
     }
