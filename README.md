@@ -16,15 +16,15 @@ git clone https://github.com/EvilFreelancer/rss-to-telegram-bot.git
 cd rss-to-telegram-bot
 ```
 
-4. Create `.env` file from example
+3. Create `.env` file from example
 
 ```shell
 cp .env.dist .env
 ```
 
-3. Fix `.env` parameters, you at least need to add list of RSS feed sources
+4. Fix `.env` parameters, you at least need to add list of RSS feed sources and API token of Telegram-bot
 
-4. Run script
+5. Run the script
 
 ```shell
 php -f rss-to-telegram.php
@@ -53,6 +53,8 @@ services:
       RSSREADER_LIMIT: 50
       # List of comma-separated URLs of RSS sources
       RSSREADER_SOURCES: https://portal1/news/rss/,https://portal2/rss/
+      # If you want to show categories as hash-tags
+      RSSREADER_SHOW_CATEGORIES_AS_TAGS: false
       # Telegram Channel Name
       TELEGRAM_CHANNEL_NAME: evilfreelancer
       # Telegram Access Token
