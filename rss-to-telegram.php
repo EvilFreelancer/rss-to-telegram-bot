@@ -36,6 +36,8 @@ function prepareHTML(string $string): string
     $string = preg_replace('/\<\/p\>\s*\<p\>/i', "\n\n", $string);
     // Cleanup other tags
     $string = strip_tags($string, ['a']);
+    // Remove multiple new lines
+    $string = preg_replace('/\n{2,}/', "\n", $string);
 
     return $string;
 }
