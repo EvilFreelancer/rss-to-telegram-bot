@@ -37,7 +37,7 @@ function prepareHTML(string $string): string
     // Cleanup other tags
     $string = strip_tags($string, ['a']);
     // Remove multiple new lines
-    $string = preg_replace('/\n{2,}/', "\n", $string);
+    $string = preg_replace('/\n{3,}/', "\n\n", $string);
 
     return $string;
 }
