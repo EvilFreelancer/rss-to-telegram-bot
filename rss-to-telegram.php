@@ -28,52 +28,85 @@ $showCategoriesAsTags = (bool) ($_ENV['RSSREADER_SHOW_CATEGORIES_AS_TAGS'] ?? fa
 
 function prepareHTML(string $string): string
 {
-    // Convert entities like &nbsp; and &arr; to symbols
-    $string = html_entity_decode($string);
     // Replace <br/> tag to a EOL
     $string = preg_replace('/\<br(\s*)?\/?\>/i', "\n\n", $string);
     // Replace couple </p><p> to a EOL
     $string = preg_replace('/\<\/p\>\s*\<p\>/i', "\n\n", $string);
-    // Cleanup other tags
+    // Cleanup other tags, keep only <a>
     $string = strip_tags($string, ['a']);
+
+    // Process <a>...</a> blocks: clean attributes, drop relative URLs, normalize entities
+    $string = preg_replace_callback('/<a\s[^>]*>([^<]*)<\/a>/i', function ($matches) {
+        $innerText = $matches[1];
+
+        if (!preg_match('/href\s*=\s*["\']([^"\']*)["\']/', $matches[0], $hrefMatch)) {
+            return $innerText;
+        }
+
+        $href = $hrefMatch[1];
+        if (!preg_match('#^https?://#i', $href)) {
+            return $innerText;
+        }
+
+        // Normalize & encoding in URL: first decode all &amp; then re-encode
+        $href = str_replace('&amp;', '&', $href);
+        $href = str_replace('&', '&amp;', $href);
+
+        // Decode HTML entities in link text, then re-escape for Telegram
+        $innerText = html_entity_decode($innerText, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $innerText = htmlspecialchars($innerText, ENT_NOQUOTES, 'UTF-8', false);
+
+        return '<a href="' . $href . '">' . $innerText . '</a>';
+    }, $string);
+
+    // Process text segments outside <a> tags: decode entities then escape for Telegram HTML
+    // ENT_NOQUOTES: only escape <, >, & (Telegram does not support &apos; entity)
+    $string = preg_replace_callback('/(?<=>|^)([^<]+)(?=<|$)/s', function ($matches) {
+        $text = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8', false);
+    }, $string);
+
     // Remove multiple new lines
     $string = preg_replace('/\n{3,}/', "\n\n", $string);
 
-    return $string;
+    return trim($string);
 }
 
 function renderTemplate(array $data): string
 {
     global $showCategoriesAsTags, $tgChannelName;
 
+    // Escape title for Telegram HTML (only <, >, & need escaping)
+    $safeTitle = htmlspecialchars($data['title'], ENT_NOQUOTES, 'UTF-8', false);
+
+    // Escape & in link URL for valid HTML attribute
+    $safeLink = str_replace('&', '&amp;', $data['link']);
+
     // Default template
-    $template = "<a href='{{link}}'>{{title}}</a>\n\n{{description}}\n\n";
+    $template = '<a href="' . $safeLink . '">' . $safeTitle . "</a>\n\n{{description}}\n\n";
 
     // Fix template of categories as tags mode enabled
     if ($showCategoriesAsTags) {
-        // Parse categories
+        $rawCategories = $data['categories'];
+        if (!is_array($rawCategories)) {
+            $rawCategories = [$rawCategories];
+        }
         $categories = [];
-        foreach ($data['categories'] as $category) {
+        foreach ($rawCategories as $category) {
             // Fix spaces and special characters
-            $categories[] = '#' . preg_replace('/[\s\-\+\&\(\)\.]+/', '_', mb_strtolower($category));
+            $categories[] = '#' . preg_replace('/[\s\-\+\&\(\)\.\/]+/', '_', mb_strtolower($category));
         }
-        $data['categories'] = implode(' ', $categories);
+        $categoriesStr = implode(' ', $categories);
 
-        // Fix template too
         if (!empty($categories)) {
-            $template .= "{{categories}} | ";
+            $template .= $categoriesStr . " | ";
         }
-    } else {
-        unset($data['categories']);
     }
 
     // Append name of telegram channel
     $template .= "@" . $tgChannelName;
 
-    $result = $template;
-    foreach ($data as $key => $value) {
-        $result = str_replace("{{" . $key . "}}", $value, $result);
-    }
+    $result = str_replace("{{description}}", $data['description'], $template);
     return $result;
 }
 
@@ -83,17 +116,35 @@ $rss = new RssReader($sources);
 // Get all posts
 $posts = $rss->getAll();
 
+function sendTelegram(string $token, string $method, array $params): array
+{
+    $url = 'https://api.telegram.org/bot' . $token . '/' . $method;
+    $ch  = curl_init($url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    $result = json_decode($response, true) ?? [];
+    $result['_http_code'] = $httpCode;
+    return $result;
+}
+
 // Submit all received posts to Telegram
+$successIds = [];
 foreach ($posts as $post) {
     // Build text message
-    $message  = renderTemplate([
+    $message = renderTemplate([
         'link'        => $post['link'] ?? '',
         'title'       => $post['title'] ?? '',
         'categories'  => $post['category'] ?? [],
         'description' => prepareHTML($post['description'] ?? ''),
     ]);
-    $endpoint = 'sendMessage';
-    $query    = [
+
+    $params = [
         'chat_id'                  => '@' . $tgChannelName,
         'disable_notification'     => true,
         'disable_web_page_preview' => false,
@@ -101,9 +152,22 @@ foreach ($posts as $post) {
         'text'                     => $message,
     ];
 
-    $url = 'https://api.telegram.org/bot' . $tgToken . '/' . $endpoint . '?' . http_build_query($query);
+    echo '>>> ' . $post['_id'] . ' ' . ($post['title'] ?? '') . PHP_EOL;
 
-    echo '>>> ' . $post['_id'] . PHP_EOL;
-    echo exec('curl "' . $url . '"') . PHP_EOL;
+    $response = sendTelegram($tgToken, 'sendMessage', $params);
+
+    if (!empty($response['ok'])) {
+        echo '    OK' . PHP_EOL;
+        $successIds[] = $post['_id'];
+    } else {
+        $desc = $response['description'] ?? 'unknown error';
+        echo '    FAILED: ' . $desc . PHP_EOL;
+    }
+
     sleep(5);
+}
+
+// Cache only successfully sent post IDs
+if (!empty($successIds)) {
+    $rss->cache->saveIds($successIds);
 }

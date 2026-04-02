@@ -1,4 +1,4 @@
-FROM php:8.2-alpine
+FROM php:8.4-alpine
 
 ENV RSSREADER_TIMEOUT=3600
 ENV RSSREADER_CACHE_DIR=/app/cache
