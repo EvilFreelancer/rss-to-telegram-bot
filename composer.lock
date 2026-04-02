@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "compolomus/rssreader",
-            "version": "2.1",
+            "version": "2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Compolomus/RssReader.git",
-                "reference": "c7b00e44bab95cdb9dff2db16f81c3cf9d5012c8"
+                "reference": "f0d40ab44024ac7c91f814f7778e9c3106c7b8c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Compolomus/RssReader/zipball/c7b00e44bab95cdb9dff2db16f81c3cf9d5012c8",
-                "reference": "c7b00e44bab95cdb9dff2db16f81c3cf9d5012c8",
+                "url": "https://api.github.com/repos/Compolomus/RssReader/zipball/f0d40ab44024ac7c91f814f7778e9c3106c7b8c3",
+                "reference": "f0d40ab44024ac7c91f814f7778e9c3106c7b8c3",
                 "shasum": ""
             },
             "require": {
@@ -65,9 +65,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Compolomus/RssReader/issues",
-                "source": "https://github.com/Compolomus/RssReader/tree/2.1"
+                "source": "https://github.com/Compolomus/RssReader/tree/2.2"
             },
-            "time": "2024-03-28T15:58:44+00:00"
+            "time": "2026-04-02T14:14:08+00:00"
         },
         {
             "name": "symfony/dotenv",
