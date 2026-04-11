@@ -123,18 +123,38 @@ function sendTelegram(string $token, string $method, array $params): array
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
     $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErrno = curl_errno($ch);
+    $curlError = curl_error($ch);
+    $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    $result = json_decode($response, true) ?? [];
-    $result['_http_code'] = $httpCode;
-    return $result;
+    if ($response === false || !is_string($response)) {
+        return [
+            'ok'          => false,
+            'description' => 'curl error: ' . ($curlError !== '' ? $curlError : 'empty response'),
+            '_curl_errno' => $curlErrno,
+            '_http_code'  => $httpCode,
+        ];
+    }
+
+    $decoded = json_decode($response, true);
+    if (!is_array($decoded)) {
+        return [
+            'ok'          => false,
+            'description' => 'invalid JSON from Telegram API',
+            '_http_code'  => $httpCode,
+            '_raw_prefix' => substr($response, 0, 200),
+        ];
+    }
+
+    $decoded['_http_code'] = $httpCode;
+    return $decoded;
 }
 
 // Submit all received posts to Telegram
-$successIds = [];
 foreach ($posts as $post) {
     // Build text message
     $message = renderTemplate([
@@ -158,16 +178,12 @@ foreach ($posts as $post) {
 
     if (!empty($response['ok'])) {
         echo '    OK' . PHP_EOL;
-        $successIds[] = $post['_id'];
+        // Persist immediately so a later crash or timeout does not re-post the same items
+        $rss->cache->saveIds([$post['_id']]);
     } else {
         $desc = $response['description'] ?? 'unknown error';
         echo '    FAILED: ' . $desc . PHP_EOL;
     }
 
     sleep(5);
-}
-
-// Cache only successfully sent post IDs
-if (!empty($successIds)) {
-    $rss->cache->saveIds($successIds);
 }

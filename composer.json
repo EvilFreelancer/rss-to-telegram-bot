@@ -11,7 +11,7 @@
     "php": "^8.2",
     "ext-simplexml": "*",
     "ext-libxml": "*",
-    "compolomus/rssreader": "^2.0",
+    "compolomus/rssreader": "^3.0",
     "symfony/dotenv": "^6.1"
   },
   "require-dev": {
